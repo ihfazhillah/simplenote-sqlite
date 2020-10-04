@@ -1,15 +1,21 @@
 package com.ihfazh.simplenote;
 
+import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.lifecycle.AndroidViewModel;
 import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProvider;
 
 import android.content.ContentValues;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.provider.ContactsContract;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
@@ -39,6 +45,7 @@ public class NoteAddEditActivity extends AppCompatActivity implements View.OnCli
 
     public static final int REQUEST_UPDATE = 200;
     public static final int RESPONSE_UPDATE = 201;
+    public static final int RESPONSE_DELETE = 301;
 
     private EditText inpTitle, inpDescription;
     private Button btnSave;
@@ -72,6 +79,9 @@ public class NoteAddEditActivity extends AppCompatActivity implements View.OnCli
 
         if (getSupportActionBar() != null){
             getSupportActionBar().setTitle(title);
+//            getSupportActionBar().setHomeButtonEnabled(true);
+//            getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+            getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         }
 
         noteHelper = NoteHelper.getInstance(this);
@@ -165,5 +175,85 @@ public class NoteAddEditActivity extends AppCompatActivity implements View.OnCli
         DateFormat format = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss", Locale.getDefault());
         Date date = new Date();
         return format.format(date);
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        if (editMode) {
+            getMenuInflater().inflate(R.menu.edit_menu, menu);
+            return true;
+        } return false;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(@NonNull MenuItem item) {
+        if (item.getItemId() == R.id.menu_close){
+            // create alert dialog
+            // if yes, delete and back to root screen
+            // if no, do nothing
+            AlertDialog.Builder builder = new AlertDialog.Builder(this)
+                    .setTitle("Hapus Note")
+                    .setMessage("Kamu yakin akan menghapus: "+ inpTitle.getText().toString())
+                    .setCancelable(true)
+                    .setNegativeButton("Tidak", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialogInterface, int i) {
+                            dialogInterface.cancel();
+                            return;
+                        }
+                    })
+                    .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialogInterface, int i) {
+                            // hapus
+                            long res = noteHelper.remove(noteId);
+                            // back to root screen
+                            if (res > 0) {
+                                Intent deleteIntent = new Intent(NoteAddEditActivity.this, MainActivity.class);
+                                setResult(RESPONSE_DELETE, deleteIntent);
+                                finish();
+                            } else {
+                                Toast.makeText(NoteAddEditActivity.this, "Hapus gagal", Toast.LENGTH_LONG).show();
+                            }
+                        }
+                    });
+
+            AlertDialog alert = builder.create();
+            alert.show();
+        } else if (item.getItemId() == android.R.id.home){
+            onBackClicked();
+        }
+        return true;
+    }
+
+    private void onBackClicked() {
+        AlertDialog.Builder builder = new AlertDialog.Builder(this)
+                .setTitle("Cancel")
+                .setMessage("Kamu yakin gak jadi isi data?")
+                .setCancelable(true)
+                .setNegativeButton("Tidak", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialogInterface, int i) {
+                        dialogInterface.cancel();
+                        return;
+                    }
+                })
+                .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialogInterface, int i) {
+                        Intent deleteIntent = new Intent(NoteAddEditActivity.this, MainActivity.class);
+//                            setResult(RESPONSE_DELETE, deleteIntent);
+                        finish();
+                    }
+                });
+
+        AlertDialog alert = builder.create();
+        alert.show();
+    }
+
+    @Override
+    public void onBackPressed() {
+//        super.onBackPressed();
+        onBackClicked();
     }
 }

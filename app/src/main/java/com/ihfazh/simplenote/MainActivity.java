@@ -94,6 +94,9 @@ public class MainActivity extends AppCompatActivity {
         } else if (requestCode == NoteAddEditActivity.REQUEST_UPDATE){
             if (resultCode == NoteAddEditActivity.RESPONSE_UPDATE){
                 snackbarMessage("Note telah diupdate...");
+            } else if (resultCode == NoteAddEditActivity.RESPONSE_DELETE){
+                snackbarMessage("Satu Note telah dihapus...");
+
             }
         }
 

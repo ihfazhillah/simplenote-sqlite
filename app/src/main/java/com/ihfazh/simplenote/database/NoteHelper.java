@@ -64,4 +64,8 @@ public class NoteHelper {
     public long update(int noteId, ContentValues noteValues) {
         return database.update(DATABASE_TABLE, noteValues, _ID + " = ?", new String[]{String.valueOf(noteId)});
     }
+
+    public long remove(int noteId) {
+        return database.delete(DATABASE_TABLE, _ID + " = ?", new String[]{String.valueOf(noteId)});
+    }
 }
