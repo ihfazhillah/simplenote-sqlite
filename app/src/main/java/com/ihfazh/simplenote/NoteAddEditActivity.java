@@ -2,6 +2,9 @@ package com.ihfazh.simplenote;
 
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.lifecycle.AndroidViewModel;
+import androidx.lifecycle.Observer;
+import androidx.lifecycle.ViewModelProvider;
 
 import android.content.ContentValues;
 import android.content.Intent;
@@ -14,6 +17,7 @@ import android.widget.Toast;
 
 import com.ihfazh.simplenote.database.NoteHelper;
 import com.ihfazh.simplenote.models.NoteModel;
+import com.ihfazh.simplenote.viewmodels.NoteAddEditActivityViewModel;
 
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
@@ -40,19 +44,25 @@ public class NoteAddEditActivity extends AppCompatActivity implements View.OnCli
     private Button btnSave;
 
     private NoteHelper noteHelper;
+    private NoteAddEditActivityViewModel viewModel;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_note_add_edit);
 
+        viewModel = new ViewModelProvider(this, new ViewModelProvider.AndroidViewModelFactory(getApplication())).get(NoteAddEditActivityViewModel.class);
+
         Intent intent = getIntent();
         boolean editMode = intent.getBooleanExtra(EDIT_MODE, false);
+        int noteId = intent.getIntExtra(EXTRA_NOTE_ID, 0);
+
         String title, btnText;
 
         if (editMode){
             title = "Update";
             btnText = "Update";
+            viewModel.loadNote(noteId);
         } else {
             title = "Create new";
             btnText = "Create new";
@@ -71,6 +81,14 @@ public class NoteAddEditActivity extends AppCompatActivity implements View.OnCli
 
         btnSave.setOnClickListener(this);
         btnSave.setText(btnText);
+
+        viewModel.getNote().observe(this, new Observer<NoteModel>() {
+            @Override
+            public void onChanged(NoteModel noteModel) {
+                inpTitle.setText(noteModel.getTitle());
+                inpDescription.setText(noteModel.getDescription());
+            }
+        });
     }
 
     @Override

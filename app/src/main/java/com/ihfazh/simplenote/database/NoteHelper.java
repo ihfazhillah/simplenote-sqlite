@@ -55,4 +55,9 @@ public class NoteHelper {
         ArrayList<NoteModel> notes = NoteCursorHelper.cursorToArraylist(cursor);
         return notes;
     }
+
+    public NoteModel getById(int id) {
+        Cursor cursor = database.query(DATABASE_TABLE, null, _ID + " = ?", new String[]{String.valueOf(id)}, null, null, null );
+        return NoteCursorHelper.cursorToArraylist(cursor).get(0);
+    }
 }
