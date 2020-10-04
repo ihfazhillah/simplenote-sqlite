@@ -11,6 +11,7 @@ import androidx.lifecycle.ViewModelProvider;
 import android.content.ContentValues;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
 import android.provider.ContactsContract;
 import android.view.Menu;
@@ -30,6 +31,7 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Locale;
 
+import static com.ihfazh.simplenote.database.DatabaseContract.NoteColumns.CONTENT_URI;
 import static com.ihfazh.simplenote.database.DatabaseContract.NoteColumns.DATE;
 import static com.ihfazh.simplenote.database.DatabaseContract.NoteColumns.DESCRIPTION;
 import static com.ihfazh.simplenote.database.DatabaseContract.NoteColumns.TITLE;
@@ -54,6 +56,7 @@ public class NoteAddEditActivity extends AppCompatActivity implements View.OnCli
     private NoteAddEditActivityViewModel viewModel;
     boolean editMode = false;
     int noteId;
+    Uri uriWithId;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -65,6 +68,7 @@ public class NoteAddEditActivity extends AppCompatActivity implements View.OnCli
         Intent intent = getIntent();
         editMode = intent.getBooleanExtra(EDIT_MODE, false);
         noteId = intent.getIntExtra(EXTRA_NOTE_ID, 0);
+        uriWithId = Uri.parse(CONTENT_URI + "/" + noteId);
 
         String title, btnText;
 
@@ -84,8 +88,8 @@ public class NoteAddEditActivity extends AppCompatActivity implements View.OnCli
             getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         }
 
-        noteHelper = NoteHelper.getInstance(this);
-        noteHelper.open();
+//        noteHelper = NoteHelper.getInstance(this);
+//        noteHelper.open();
 
         btnSave = findViewById(R.id.btnSave);
         inpTitle = findViewById(R.id.et_title);
@@ -106,7 +110,7 @@ public class NoteAddEditActivity extends AppCompatActivity implements View.OnCli
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        noteHelper.close();
+//        noteHelper.close();
     }
 
     @Override
@@ -125,12 +129,13 @@ public class NoteAddEditActivity extends AppCompatActivity implements View.OnCli
                 ContentValues noteValues = new ContentValues();
                 noteValues.put(TITLE, title);
                 noteValues.put(DESCRIPTION, description);
-                long result = noteHelper.update(noteId, noteValues);
+                getContentResolver().update(uriWithId, noteValues, null, null);
+//                long result = noteHelper.update(noteId, noteValues);
 
-                if (0 > result){
-                    Toast.makeText(this, "Gagal mengubah data", Toast.LENGTH_LONG).show();
-                    return;
-                }
+//                if (0 > result){
+//                    Toast.makeText(this, "Gagal mengubah data", Toast.LENGTH_LONG).show();
+//                    return;
+//                }
 
                 NoteModel note = new NoteModel();
 //                note.setDate(date);
@@ -149,12 +154,14 @@ public class NoteAddEditActivity extends AppCompatActivity implements View.OnCli
                 noteValues.put(DESCRIPTION, description);
                 noteValues.put(DATE, date);
 
-                long result = noteHelper.insert(noteValues);
+//                long result = noteHelper.insert(noteValues);
+//
+//                if (0 > result){
+//                    Toast.makeText(this, "Gagal menambah data", Toast.LENGTH_LONG).show();
+//                    return;
+//                }
 
-                if (0 > result){
-                    Toast.makeText(this, "Gagal menambah data", Toast.LENGTH_LONG).show();
-                    return;
-                }
+                getContentResolver().insert(CONTENT_URI, noteValues);
 
                 NoteModel note = new NoteModel();
                 note.setDate(date);
@@ -206,15 +213,16 @@ public class NoteAddEditActivity extends AppCompatActivity implements View.OnCli
                         @Override
                         public void onClick(DialogInterface dialogInterface, int i) {
                             // hapus
-                            long res = noteHelper.remove(noteId);
+//                            long res = noteHelper.remove(noteId);
                             // back to root screen
-                            if (res > 0) {
+//                            if (res > 0) {
+                            getContentResolver().delete(uriWithId, null, null);
                                 Intent deleteIntent = new Intent(NoteAddEditActivity.this, MainActivity.class);
                                 setResult(RESPONSE_DELETE, deleteIntent);
                                 finish();
-                            } else {
-                                Toast.makeText(NoteAddEditActivity.this, "Hapus gagal", Toast.LENGTH_LONG).show();
-                            }
+//                            } else {
+//                                Toast.makeText(NoteAddEditActivity.this, "Hapus gagal", Toast.LENGTH_LONG).show();
+//                            }
                         }
                     });
 

@@ -113,4 +113,5 @@ public class NoteProvider extends ContentProvider {
 
         return (int) updated;
     }
+
 }

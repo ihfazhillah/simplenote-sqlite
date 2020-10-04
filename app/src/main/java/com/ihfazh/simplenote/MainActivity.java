@@ -34,9 +34,9 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        if (databaseHelper != null){
-            databaseHelper.close();
-        }
+//        if (databaseHelper != null){
+//            databaseHelper.close();
+//        }
     }
 
     @Override
@@ -44,8 +44,8 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        databaseHelper = NoteHelper.getInstance(this);
-        databaseHelper.open();
+//        databaseHelper = NoteHelper.getInstance(this);
+//        databaseHelper.open();
 
 
         fabBtn = findViewById(R.id.fabBtn);
