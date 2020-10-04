@@ -10,12 +10,10 @@ import androidx.recyclerview.widget.RecyclerView;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
-import android.widget.Toast;
 
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.snackbar.Snackbar;
 import com.ihfazh.simplenote.adapters.NoteListAdapter;
-import com.ihfazh.simplenote.database.DatabaseHelper;
 import com.ihfazh.simplenote.database.NoteHelper;
 import com.ihfazh.simplenote.models.NoteModel;
 import com.ihfazh.simplenote.viewmodels.MainActivityViewModel;
@@ -60,6 +58,15 @@ public class MainActivity extends AppCompatActivity {
         rvNotes.setLayoutManager(new LinearLayoutManager(this));
 
         adapter = new NoteListAdapter();
+        adapter.setCallback(new NoteListAdapter.NoteListClicked() {
+            @Override
+            public void onClick(int id) {
+                Intent intent = new Intent(MainActivity.this, NoteAddEditActivity.class);
+                intent.putExtra(NoteAddEditActivity.EDIT_MODE, true);
+                intent.putExtra(NoteAddEditActivity.EXTRA_NOTE_ID, id);
+                startActivityForResult(intent, NoteAddEditActivity.REQUEST_UPDATE);
+            }
+        });
         rvNotes.setAdapter(adapter);
 
         mainActivityViewModel = new ViewModelProvider(this, new ViewModelProvider.NewInstanceFactory()).get(MainActivityViewModel.class);

@@ -16,6 +16,7 @@ import java.util.ArrayList;
 public class NoteListAdapter extends RecyclerView.Adapter<NoteListAdapter.ViewHolder> {
 
     ArrayList<NoteModel> notes = new ArrayList<>();
+    private NoteListClicked callback;
 
     public void setNotes(ArrayList<NoteModel> notes) {
         this.notes = notes;
@@ -36,10 +37,16 @@ public class NoteListAdapter extends RecyclerView.Adapter<NoteListAdapter.ViewHo
 
     @Override
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
-        NoteModel note = notes.get(position);
+        final NoteModel note = notes.get(position);
         holder.tvTitle.setText(note.getTitle());
         holder.tvDescription.setText(note.getDescription());
         holder.tvDate.setText(note.getDate());
+        holder.itemView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                callback.onClick(note.getId());
+            }
+        });
     }
 
     @Override
@@ -49,6 +56,10 @@ public class NoteListAdapter extends RecyclerView.Adapter<NoteListAdapter.ViewHo
 
     public ArrayList<NoteModel> getNotes() {
         return notes;
+    }
+
+    public void setCallback(NoteListClicked callback) {
+        this.callback = callback;
     }
 
     public class ViewHolder extends RecyclerView.ViewHolder {
@@ -62,4 +73,9 @@ public class NoteListAdapter extends RecyclerView.Adapter<NoteListAdapter.ViewHo
             tvTitle = itemView.findViewById(R.id.tvTitle);
         }
     }
+
+    public interface NoteListClicked{
+        void onClick(int id);
+    }
 }
+

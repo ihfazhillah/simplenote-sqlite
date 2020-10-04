@@ -30,6 +30,11 @@ public class NoteAddEditActivity extends AppCompatActivity implements View.OnCli
     public static final int RESPONSE_ADD = 101;
 
     public static final String EXTRA_NOTE = "extra_note";
+    public static final String EDIT_MODE = "edit_mode";
+    public static final String EXTRA_NOTE_ID = "extra_note_id";
+
+    public static final int REQUEST_UPDATE = 200;
+    public static final int RESPONSE_UPDATE = 200;
 
     private EditText inpTitle, inpDescription;
     private Button btnSave;
@@ -41,6 +46,22 @@ public class NoteAddEditActivity extends AppCompatActivity implements View.OnCli
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_note_add_edit);
 
+        Intent intent = getIntent();
+        boolean editMode = intent.getBooleanExtra(EDIT_MODE, false);
+        String title, btnText;
+
+        if (editMode){
+            title = "Update";
+            btnText = "Update";
+        } else {
+            title = "Create new";
+            btnText = "Create new";
+        }
+
+        if (getSupportActionBar() != null){
+            getSupportActionBar().setTitle(title);
+        }
+
         noteHelper = NoteHelper.getInstance(this);
         noteHelper.open();
 
@@ -49,6 +70,7 @@ public class NoteAddEditActivity extends AppCompatActivity implements View.OnCli
         inpDescription = findViewById(R.id.et_description);
 
         btnSave.setOnClickListener(this);
+        btnSave.setText(btnText);
     }
 
     @Override
