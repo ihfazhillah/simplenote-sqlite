@@ -8,6 +8,7 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import android.content.Intent;
+import android.database.Cursor;
 import android.os.Bundle;
 import android.view.View;
 
@@ -15,10 +16,13 @@ import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.snackbar.Snackbar;
 import com.ihfazh.simplenote.adapters.NoteListAdapter;
 import com.ihfazh.simplenote.database.NoteHelper;
+import com.ihfazh.simplenote.helpers.NoteCursorHelper;
 import com.ihfazh.simplenote.models.NoteModel;
 import com.ihfazh.simplenote.viewmodels.MainActivityViewModel;
 
 import java.util.ArrayList;
+
+import static com.ihfazh.simplenote.database.DatabaseContract.NoteColumns.CONTENT_URI;
 
 public class MainActivity extends AppCompatActivity {
     private FloatingActionButton fabBtn;
@@ -77,7 +81,8 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
-        mainActivityViewModel.setNotes(databaseHelper.loadNotes());
+//        mainActivityViewModel.setNotes(databaseHelper.loadNotes());
+        loadNotes();
     }
 
     @Override
@@ -100,10 +105,17 @@ public class MainActivity extends AppCompatActivity {
             }
         }
 
-        mainActivityViewModel.setNotes(databaseHelper.loadNotes());
+//        mainActivityViewModel.setNotes(databaseHelper.loadNotes());
+        loadNotes();
     }
 
     private void snackbarMessage(String message) {
         Snackbar.make(rvNotes, message, Snackbar.LENGTH_SHORT).show();
+    }
+
+    private void loadNotes(){
+        Cursor dataCursor = getApplicationContext().getContentResolver().query(CONTENT_URI, null, null, null);
+        ArrayList<NoteModel> notes = NoteCursorHelper.cursorToArraylist(dataCursor);
+        mainActivityViewModel.setNotes(notes);
     }
 }

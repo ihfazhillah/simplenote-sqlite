@@ -68,4 +68,14 @@ public class NoteHelper {
     public long remove(int noteId) {
         return database.delete(DATABASE_TABLE, _ID + " = ?", new String[]{String.valueOf(noteId)});
     }
+
+    public Cursor queryAll() {
+        Cursor cursor = database.query(DATABASE_TABLE, null, null, null, null, null, _ID + " DESC");
+        return cursor;
+    }
+
+    public Cursor queryById(String id) {
+        Cursor cursor = database.query(DATABASE_TABLE, null, _ID + " = ?", new String[]{String.valueOf(id)}, null, null, null );
+        return cursor;
+    }
 }
