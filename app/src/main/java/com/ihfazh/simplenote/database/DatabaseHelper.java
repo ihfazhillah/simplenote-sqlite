@@ -14,10 +14,10 @@ import static com.ihfazh.simplenote.database.DatabaseContract.TABLE_NAME;
 
 public class DatabaseHelper extends SQLiteOpenHelper {
     public static final String DB_NAME = "simplenote";
-    public static final int DB_VERSION = 1;
+    public static final int DB_VERSION = 2;
 
     public static final String SQL_CREATE_TABLE = String.format(
-            "CREATE TABLE %s (%s INTEGER PRIMARY KEY AUTOINCREMENT, %s TEXT NOT NULL, %S TEXT NOT NULL, %S TEXT NOT NULL);",
+            "CREATE TABLE %s (%s INTEGER PRIMARY KEY AUTOINCREMENT, %s TEXT NOT NULL, %s TEXT NOT NULL, %s TEXT NOT NULL);",
             TABLE_NAME,
             _ID,
             TITLE,

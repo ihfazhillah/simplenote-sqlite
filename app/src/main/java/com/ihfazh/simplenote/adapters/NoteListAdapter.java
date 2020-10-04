@@ -47,6 +47,10 @@ public class NoteListAdapter extends RecyclerView.Adapter<NoteListAdapter.ViewHo
         return notes.size();
     }
 
+    public ArrayList<NoteModel> getNotes() {
+        return notes;
+    }
+
     public class ViewHolder extends RecyclerView.ViewHolder {
         TextView tvDate, tvTitle, tvDescription;
 

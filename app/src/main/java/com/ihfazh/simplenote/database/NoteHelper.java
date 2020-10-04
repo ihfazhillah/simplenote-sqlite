@@ -2,9 +2,16 @@ package com.ihfazh.simplenote.database;
 
 import android.content.ContentValues;
 import android.content.Context;
+import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 
+import com.ihfazh.simplenote.helpers.NoteCursorHelper;
+import com.ihfazh.simplenote.models.NoteModel;
+
+import java.util.ArrayList;
+
+import static android.provider.BaseColumns._ID;
 import static com.ihfazh.simplenote.database.DatabaseContract.TABLE_NAME;
 
 public class NoteHelper {
@@ -41,5 +48,11 @@ public class NoteHelper {
 
     public long insert(ContentValues values){
         return database.insert(DATABASE_TABLE, null, values);
+    }
+
+    public ArrayList<NoteModel> loadNotes(){
+        Cursor cursor = database.query(DATABASE_TABLE, null, null, null, null, null, _ID + " DESC");
+        ArrayList<NoteModel> notes = NoteCursorHelper.cursorToArraylist(cursor);
+        return notes;
     }
 }

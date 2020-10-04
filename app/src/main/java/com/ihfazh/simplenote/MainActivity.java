@@ -2,6 +2,8 @@ package com.ihfazh.simplenote;
 
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.lifecycle.Observer;
+import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -13,17 +15,36 @@ import android.widget.Toast;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.snackbar.Snackbar;
 import com.ihfazh.simplenote.adapters.NoteListAdapter;
+import com.ihfazh.simplenote.database.DatabaseHelper;
+import com.ihfazh.simplenote.database.NoteHelper;
 import com.ihfazh.simplenote.models.NoteModel;
+import com.ihfazh.simplenote.viewmodels.MainActivityViewModel;
+
+import java.util.ArrayList;
 
 public class MainActivity extends AppCompatActivity {
     private FloatingActionButton fabBtn;
     private RecyclerView rvNotes;
     private NoteListAdapter adapter;
+    private MainActivityViewModel mainActivityViewModel;
+    NoteHelper databaseHelper;
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        if (databaseHelper != null){
+            databaseHelper.close();
+        }
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        databaseHelper = NoteHelper.getInstance(this);
+        databaseHelper.open();
+
 
         fabBtn = findViewById(R.id.fabBtn);
         fabBtn.setOnClickListener(new View.OnClickListener() {
@@ -40,6 +61,16 @@ public class MainActivity extends AppCompatActivity {
 
         adapter = new NoteListAdapter();
         rvNotes.setAdapter(adapter);
+
+        mainActivityViewModel = new ViewModelProvider(this, new ViewModelProvider.NewInstanceFactory()).get(MainActivityViewModel.class);
+        mainActivityViewModel.getNotes().observe(this, new Observer<ArrayList<NoteModel>>() {
+            @Override
+            public void onChanged(ArrayList<NoteModel> noteModels) {
+                adapter.setNotes(noteModels);
+            }
+        });
+
+        mainActivityViewModel.setNotes(databaseHelper.loadNotes());
     }
 
     @Override
@@ -52,8 +83,8 @@ public class MainActivity extends AppCompatActivity {
         if (requestCode == NoteAddEditActivity.REQUEST_ADD){
             if (resultCode == NoteAddEditActivity.RESPONSE_ADD){
                 NoteModel note = data.getParcelableExtra(NoteAddEditActivity.EXTRA_NOTE);
-                snackbarMessage("Ini adalah note: " + note.getTitle());
-                adapter.addNote(note);
+                snackbarMessage("Note baru telah ditambahkan.");
+                mainActivityViewModel.setNotes(databaseHelper.loadNotes());
                 return;
             }
         }
