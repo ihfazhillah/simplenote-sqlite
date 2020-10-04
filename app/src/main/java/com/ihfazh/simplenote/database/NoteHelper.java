@@ -60,4 +60,8 @@ public class NoteHelper {
         Cursor cursor = database.query(DATABASE_TABLE, null, _ID + " = ?", new String[]{String.valueOf(id)}, null, null, null );
         return NoteCursorHelper.cursorToArraylist(cursor).get(0);
     }
+
+    public long update(int noteId, ContentValues noteValues) {
+        return database.update(DATABASE_TABLE, noteValues, _ID + " = ?", new String[]{String.valueOf(noteId)});
+    }
 }

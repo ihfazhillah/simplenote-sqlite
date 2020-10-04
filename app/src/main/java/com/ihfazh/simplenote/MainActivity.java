@@ -89,12 +89,15 @@ public class MainActivity extends AppCompatActivity {
 
         if (requestCode == NoteAddEditActivity.REQUEST_ADD){
             if (resultCode == NoteAddEditActivity.RESPONSE_ADD){
-                NoteModel note = data.getParcelableExtra(NoteAddEditActivity.EXTRA_NOTE);
                 snackbarMessage("Note baru telah ditambahkan.");
-                mainActivityViewModel.setNotes(databaseHelper.loadNotes());
-                return;
+            }
+        } else if (requestCode == NoteAddEditActivity.REQUEST_UPDATE){
+            if (resultCode == NoteAddEditActivity.RESPONSE_UPDATE){
+                snackbarMessage("Note telah diupdate...");
             }
         }
+
+        mainActivityViewModel.setNotes(databaseHelper.loadNotes());
     }
 
     private void snackbarMessage(String message) {

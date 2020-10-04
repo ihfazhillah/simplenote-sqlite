@@ -38,13 +38,15 @@ public class NoteAddEditActivity extends AppCompatActivity implements View.OnCli
     public static final String EXTRA_NOTE_ID = "extra_note_id";
 
     public static final int REQUEST_UPDATE = 200;
-    public static final int RESPONSE_UPDATE = 200;
+    public static final int RESPONSE_UPDATE = 201;
 
     private EditText inpTitle, inpDescription;
     private Button btnSave;
 
     private NoteHelper noteHelper;
     private NoteAddEditActivityViewModel viewModel;
+    boolean editMode = false;
+    int noteId;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -54,8 +56,8 @@ public class NoteAddEditActivity extends AppCompatActivity implements View.OnCli
         viewModel = new ViewModelProvider(this, new ViewModelProvider.AndroidViewModelFactory(getApplication())).get(NoteAddEditActivityViewModel.class);
 
         Intent intent = getIntent();
-        boolean editMode = intent.getBooleanExtra(EDIT_MODE, false);
-        int noteId = intent.getIntExtra(EXTRA_NOTE_ID, 0);
+        editMode = intent.getBooleanExtra(EDIT_MODE, false);
+        noteId = intent.getIntExtra(EXTRA_NOTE_ID, 0);
 
         String title, btnText;
 
@@ -109,27 +111,52 @@ public class NoteAddEditActivity extends AppCompatActivity implements View.OnCli
                 return;
             }
 
-            ContentValues noteValues = new ContentValues();
-            noteValues.put(TITLE, title);
-            noteValues.put(DESCRIPTION, description);
-            noteValues.put(DATE, date);
+            if (editMode){
+                ContentValues noteValues = new ContentValues();
+                noteValues.put(TITLE, title);
+                noteValues.put(DESCRIPTION, description);
+                long result = noteHelper.update(noteId, noteValues);
 
-            long result = noteHelper.insert(noteValues);
+                if (0 > result){
+                    Toast.makeText(this, "Gagal mengubah data", Toast.LENGTH_LONG).show();
+                    return;
+                }
 
-            if (0 > result){
-                Toast.makeText(this, "Gagal menambah data", Toast.LENGTH_LONG).show();
-                return;
+                NoteModel note = new NoteModel();
+//                note.setDate(date);
+                note.setTitle(title);
+                note.setDescription(description);
+
+                Intent resultIntent = new Intent(NoteAddEditActivity.this, MainActivity.class);
+                resultIntent.putExtra(EXTRA_NOTE, note);
+                setResult(RESPONSE_UPDATE, resultIntent);
+                finish();
+
+            } else {
+
+                ContentValues noteValues = new ContentValues();
+                noteValues.put(TITLE, title);
+                noteValues.put(DESCRIPTION, description);
+                noteValues.put(DATE, date);
+
+                long result = noteHelper.insert(noteValues);
+
+                if (0 > result){
+                    Toast.makeText(this, "Gagal menambah data", Toast.LENGTH_LONG).show();
+                    return;
+                }
+
+                NoteModel note = new NoteModel();
+                note.setDate(date);
+                note.setTitle(title);
+                note.setDescription(description);
+
+                Intent resultIntent = new Intent(NoteAddEditActivity.this, MainActivity.class);
+                resultIntent.putExtra(EXTRA_NOTE, note);
+                setResult(RESPONSE_ADD, resultIntent);
+                finish();
+
             }
-
-            NoteModel note = new NoteModel();
-            note.setDate(date);
-            note.setTitle(title);
-            note.setDescription(description);
-
-            Intent resultIntent = new Intent(NoteAddEditActivity.this, MainActivity.class);
-            resultIntent.putExtra(EXTRA_NOTE, note);
-            setResult(RESPONSE_ADD, resultIntent);
-            finish();
         }
 
     }
